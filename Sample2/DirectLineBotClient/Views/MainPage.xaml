@@ -1,0 +1,97 @@
+﻿<Page
+    x:Class="DirectLineBotClient.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="using:DirectLineBotClient.ViewModels"
+    xmlns:selectors="using:DirectLineBotClient.Selectors"
+    xmlns:converters="using:DirectLineBotClient.Converters"
+    Style="{StaticResource PageStyle}"
+    mc:Ignorable="d">
+    <Page.DataContext>
+        <viewModels:MainViewModel />
+    </Page.DataContext>
+    <Page.Resources>
+        <converters:AttachmentToHeroCardConverter x:Key="AttachmentToHeroCardConverter"/>
+        <DataTemplate x:Key="ImageTemplate">
+            <Image Source="{Binding ContentUrl}"/>
+        </DataTemplate>
+        <DataTemplate x:Key="HeroCardTemplate">
+            <StackPanel>
+                <TextBlock Text="{Binding Title}"/>
+                <ItemsControl ItemsSource="{Binding Images}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding Url}" Margin="4"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock Text="{Binding Text}"/>
+            </StackPanel>
+        </DataTemplate>
+        <selectors:ItemTemplateSelector x:Key="ItemTemplateSelector"
+                                        ImageTemplate="{StaticResource ImageTemplate}"
+                                        HeroCardTempalte="{StaticResource HeroCardTemplate}"/>
+    </Page.Resources>
+    <Grid
+        x:Name="ContentArea"
+        Margin="{StaticResource MediumLeftRightMargin}">
+
+        <Grid.RowDefinitions>
+            <RowDefinition x:Name="TitleRow" Height="48" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            x:Name="TitlePage"
+            x:Uid="Main_Title"
+            Style="{StaticResource PageTitleStyle}" />
+
+        <Grid
+            Grid.Row="1"
+            Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.5*" />
+                <ColumnDefinition Width="0.5*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Margin="10">
+                <TextBlock Text="Conversation" Style="{StaticResource HeaderTextBlockStyle}" />
+                <TextBlock Text="{Binding ConversationText}" TextWrapping="WrapWholeWords"
+                           Style="{StaticResource BodyTextBlockStyle}" />
+            </StackPanel>
+            <ListView Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" BorderBrush="Aqua" BorderThickness="2"
+                      Padding="4"
+                      ItemsSource="{Binding DialogList}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Text}" TextWrapping="WrapWholeWords" Style="{StaticResource BodyTextBlockStyle}"/>
+                            <ItemsControl ItemsSource="{Binding Attachments, Converter={StaticResource AttachmentToHeroCardConverter}}"
+                                          ItemTemplateSelector="{StaticResource ItemTemplateSelector}">
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Grid Grid.Column="1" Grid.Row="1" Margin="4" Background="Cyan">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Command>" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" Text="{Binding InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="4,0" />
+                <Button Grid.Column="2" Content="Send" Command="{Binding SendCommand}" />
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>
+
+
+

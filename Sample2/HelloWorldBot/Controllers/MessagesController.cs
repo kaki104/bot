@@ -20,17 +20,17 @@ namespace HelloWorldBot
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
+                await Conversation.SendAsync(activity, () => new Dialogs.DirectLineBotDialog());
             }
             else
             {
-                HandleSystemMessage(activity);
+                await HandleSystemMessage(activity);
             }
             var response = Request.CreateResponse(HttpStatusCode.OK);
             return response;
         }
 
-        private Activity HandleSystemMessage(Activity message)
+        private async Task HandleSystemMessage(Activity message)
         {
             if (message.Type == ActivityTypes.DeleteUserData)
             {
@@ -39,20 +39,15 @@ namespace HelloWorldBot
             }
             else if (message.Type == ActivityTypes.ConversationUpdate)
             {
-                // Handle conversation state changes, like members being added and removed
-                // Use Activity.MembersAdded and Activity.MembersRemoved and Activity.Action for info
-                // Not available in all channels
+                if (message.MembersAdded.All(o => o.Id != message.Recipient.Id)) return;
 
-                IConversationUpdateActivity update = message;
-
-                if (update.MembersAdded != null
-                    && update.MembersAdded.Any(m => m.Id != update.Recipient.Id))
-                {
-                    var member = update.MembersAdded.First();
-                    var connector = new ConnectorClient(new Uri(update.ServiceUrl));
-                    var reply = message.CreateReply($"Hello World Bot Framework {member.Name}!");
-                    connector.Conversations.ReplyToActivityAsync(reply);
-                }
+                var client = new ConnectorClient(new Uri(message.ServiceUrl));
+                var reply = message.CreateReply();
+                reply.Text = "Welcome to the Hello Bot to showcase the DirectLine API.";
+                reply.Text += " Send 'Show me a hero card' or 'Send me a BotFramework image' ";
+                reply.Text += "to see how the DirectLine client supports custom channel data.";
+                reply.Text += " Any other message will be echoed.";
+                await client.Conversations.ReplyToActivityAsync(reply);
             }
             else if (message.Type == ActivityTypes.ContactRelationUpdate)
             {
@@ -66,8 +61,6 @@ namespace HelloWorldBot
             else if (message.Type == ActivityTypes.Ping)
             {
             }
-
-            return null;
         }
     }
 }
