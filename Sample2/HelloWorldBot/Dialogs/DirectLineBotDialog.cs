@@ -28,12 +28,23 @@ namespace HelloWorldBot.Dialogs
                     var heroCardAttachment = new HeroCard
                     {
                         Title = "Justice League Hero Card",
+                        Subtitle = "from DC",
                         Text = "Displayed in the DirectLine client",
                         Images = new List<CardImage>
                         {
                             new CardImage("http://t1.daumcdn.net/movie/1a169e0fe5a9e958beaa15996ea9bc515ad6e5ad"),
                             new CardImage("http://t1.daumcdn.net/movie/a4888be3ddeb4c905a7e06a8d08ad73630d1e15c"),
                             new CardImage("http://t1.daumcdn.net/movie/1baa976213c745a66e668517ff4c87f7196d0fb2")
+                        },
+                        Buttons = new List<CardAction>
+                        {
+                            new CardAction
+                            {
+                                DisplayText = "Detail",
+                                Type = "openUrl",
+                                Title = "Justic League 2017",
+                                Value = "http://movie.daum.net/moviedb/main?movieId=102145"
+                            }
                         }
                     }.ToAttachment();
                     reply.Attachments.Add(heroCardAttachment);
